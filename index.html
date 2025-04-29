@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>E-commerce NavBar</title>
-  <meta name="description" content="This is the navigation bar of an e-commerce application" />
+  <title>E-Commerce Footer</title>
+  <meta name="description" content="This is the footer of an e-commerce application" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <script type="module" src="/src/shared/scripts/fonts.scripts.ts"></script>
@@ -18,26 +18,37 @@
       src: local('Arial');
     }
 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Noto Sans', 'Noto Sans Fallback', system-ui, -apple-system, BlinkMacSystemFont;
       --page-template-column: 1fr clamp(0px, 90vw, 1200px) 1fr;
       display: grid;
       grid-template-columns: var(--page-template-column);
-
+      grid-template-rows: 1fr auto;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding-bottom: 10vh;
       & > * {
         grid-column: 2 / 3;
       }
+
+      & > div {
+    
+      }
+
     }
 
-    *:not(:host) {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
   </style>
- <script type="module" src="/src/shared/components/nav-bar/nav-bar.desktop.component.ts"></script>
+  <script type="module" src="/src/shared/components/footer/footer.component.ts"></script>
 </head>
 <body>
   <sn-nav-bar-desktop></sn-nav-bar-desktop>
+  <div></div>
+  <sn-footer></sn-footer>
 </body>
 </html>

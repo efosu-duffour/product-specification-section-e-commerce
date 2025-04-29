@@ -18,6 +18,9 @@ export class SNNavBarDesktop extends LitElement {
 
   static styles = [
     css`
+    :host {
+      z-index: 2;
+    }
       header {
         container-type: inline-size;
         container-name: --sn-nav-bar-desktop;

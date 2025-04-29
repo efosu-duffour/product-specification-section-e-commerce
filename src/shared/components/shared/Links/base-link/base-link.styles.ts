@@ -25,7 +25,7 @@ export const LINK_TOKENS = css`
     --sn-lkn-active-outline: unset;
     --sn-lkn-active-border: unset;
     --sn-lkn-active-background: unset;
-    --sn-lkn-padding: 0.3em 0.6em;
+    --sn-lkn-padding: 0em;
     --sn-lkn-border-radius: 1000px;
     --sn-lkn-text-transform: none;
     --sn-lkn-decoration: none;
@@ -43,6 +43,7 @@ export const LINK_TOKENS = css`
 
   a:focus-visible {
     outline-color: var(--sn-lkn-focus-outline-clr);
+    outline-offset: 5px;
     color: var(--sn-lkn-focus-clr);
     border: var(--sn-lkn-focus-border);
     background: var(--sn-lkn-focus-background);
