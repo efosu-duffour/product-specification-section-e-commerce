@@ -20,11 +20,6 @@ export class SNCollections extends LitElement {
         box-sizing: border-box;
       }
 
-      sn-img {
-        height: 100%;
-        width: 100%;
-      }
-
       sn-img::part(img) {
         height: 100%;
         width: 100%;
@@ -51,12 +46,17 @@ export class SNCollections extends LitElement {
       }
 
       .collections-container {
+        --row-gap: 20px;
+        --container-height: 250px;
+
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        grid-auto-rows: 250px;
+        grid-auto-rows: repeat(2, var(--container-height));
+        width: 100%;
+        height: fit-content;
 
-        row-gap: 20px;
-        column-gap: 20px;
+        row-gap: var(--row-gap);
+        column-gap: var(--row-gap);
         isolation: isolate;
 
         li:nth-of-type(2),
@@ -81,20 +81,21 @@ export class SNCollections extends LitElement {
         border-radius: 10px;
         overflow: hidden;
         list-style: none;
+
         &:nth-of-type(1) {
           grid-row: span 2;
+          height: calc(2 * var(--container-height) + var(--row-gap));
         }
 
         &:nth-of-type(2),
         &:nth-of-type(3) {
+          height: var(--container-height);
           grid-column: 2 / 3;
         }
       }
 
       .collection {
         position: relative;
-        height: 100%;
-        width: 100%;
 
         @media (hover: hover) {
           .label .description {
@@ -152,9 +153,17 @@ export class SNCollections extends LitElement {
           will-change: font-size;
           outline: none;
 
+          &:active {
+            background: none;
+          }
+
           @media (hover: hover) {
             font-size: 1.4rem;
           }
+        }
+
+        .name::part(a):active {
+          background-color: unset;
         }
 
         .description {
@@ -193,28 +202,37 @@ export class SNCollections extends LitElement {
 
   private _collectionComponent(collection: Collection) {
     return html`
-      <li>
-        <div class="collection">
-          <sn-img src=${collection.image_url} alt=${collection.name}></sn-img>
-          <div class="label">
-            <sn-link class="name">${collection.name}</sn-link>
-            <span class="description">${collection.description}</span>
-          </div>
+      <li class="collection">
+        <sn-img src=${collection.image_url} alt=${collection.name}></sn-img>
+        <div class="label">
+          <sn-link class="name">${collection.name}</sn-link>
+          <span class="description">${collection.description}</span>
         </div>
       </li>
     `;
   }
 
+  private _placeholders() {
+    return html` <li></li> `;
+  }
+
   protected render() {
+    const isLoaded: boolean = this._collections.length !== 0;
     return html`
       <section>
         <h2>Our Collections</h2>
         <ul class="collections-container">
-          ${repeat(
-            this._collections,
-            (collection) => collection.collection_id,
-            (collection) => this._collectionComponent(collection)
-          )}
+          ${isLoaded
+            ? repeat(
+                this._collections,
+                (collection) => collection.collection_id,
+                (collection) => this._collectionComponent(collection)
+              )
+            : repeat(
+                [1, 2, 3],
+                (val) => val,
+                () => this._placeholders()
+              )}
         </ul>
       </section>
     `;
