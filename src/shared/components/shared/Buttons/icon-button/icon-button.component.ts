@@ -55,7 +55,7 @@ export class SNIconButton extends SNBaseButton{
     @query('#tooltip')
     private _tooltipElem?: HTMLElement;
 
-    private _popoverTimerID?: number;
+    private _popoverTimerID?: number | NodeJS.Timeout;
 
     @property({type: String, reflect: true, converter: skipEmptyStringConverter})
     href: string = '';

@@ -11,6 +11,9 @@
   <script type="module" src="/src/shared/scripts/fonts.scripts.ts"></script>
   <link rel="stylesheet" href="./src/index.css" />
   <style>
+    html {
+      scrollbar-gutter: stable;
+    }
     @font-face {
       font-family: 'Noto Sans Fallback';
       size-adjust: 106%;
@@ -32,23 +35,21 @@
       grid-template-rows: 1fr auto;
       min-height: 100vh;
       min-height: 100dvh;
-      padding-bottom: 10vh;
+      justify-content: center;
+      align-items: center;
+
+      overflow-y: scroll;      
       & > * {
         grid-column: 2 / 3;
       }
 
-      & > div {
-    
-      }
-
     }
 
+
   </style>
-  <script type="module" src="/src/shared/components/footer/footer.component.ts"></script>
+  <script type="module" src="/src/shared/components/collections/collections.component.ts"></script>
 </head>
 <body>
-  <sn-nav-bar-desktop></sn-nav-bar-desktop>
-  <div></div>
-  <sn-footer></sn-footer>
+  <sn-collections></sn-collections>
 </body>
 </html>

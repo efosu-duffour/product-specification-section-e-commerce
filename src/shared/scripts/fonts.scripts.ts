@@ -24,6 +24,6 @@ function loadFont(): void {
       document.fonts.add(fontface);
     })
     .catch((err) => {
-      console.error(err);
+      console.warn(err);
     });
 }

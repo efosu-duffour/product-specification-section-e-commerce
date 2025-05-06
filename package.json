@@ -7,14 +7,18 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "test": "vitest",
     "cy:open": "cypress open"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "cypress": "^14.3.1",
     "cypress-ct-lit": "^1.0.0",
+    "jsdom": "^26.1.0",
     "lit": "^3.3.0",
+    "msw": "^2.7.5",
     "typescript": "~5.7.2",
-    "vite": "^6.3.1"
+    "vite": "^6.3.1",
+    "vitest": "^3.1.2"
   }
 }

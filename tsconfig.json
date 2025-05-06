@@ -23,5 +23,5 @@
 
     "types": []
   },
-  "include": ["src", "./cypress"]
+  "include": ["src", "./cypress", "tests/resolve-url-directive.test.ts"]
 }

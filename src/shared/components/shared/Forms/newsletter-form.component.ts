@@ -30,30 +30,38 @@ export class SNNewsletterForm extends LitElement {
       }
 
       input[type="email"] {
-        padding: 5px;
+        padding: 10px;
         border-radius: 5px;
         border-style: solid;
         border-color: rgb(194, 194, 194);
         border-width: 1px;
         font-family: inherit;
+        outline-color: transparent;
+        outline-offset: 4px;
+
+        @media (prefers-reduced-motion: no-preference) {
+          transition: outline-color 200ms ease-in-out;
+        }
       }
 
       button[type="submit"] {
-        padding: 7px;
+        padding: 10px;
         border-style: none;
         border-radius: 4px;
 
         font-weight: 600;
         cursor: pointer;
         flex-grow: 1;
-        
 
         color: white;
         background-color: rgba(3, 3, 173, 0.863);
-        will-change: background-color color;
+        outline-color: transparent;
+        outline-offset: 4px;
+        will-change: background-color, color, outline-color;
 
         @media (prefers-reduced-motion: no-preference) {
-          transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+          transition: background-color 200ms ease-in-out,
+            color 200ms ease-in-out, outline-color 200ms ease-in-out;
         }
       }
 
@@ -68,6 +76,7 @@ export class SNNewsletterForm extends LitElement {
       }
 
       button[type="submit"].pending {
+        pointer-events: none;
         animation-name: background-pulse;
         animation-iteration-count: infinite;
         animation-duration: 500ms;
@@ -99,7 +108,6 @@ export class SNNewsletterForm extends LitElement {
       button:focus-visible,
       input:focus-visible {
         outline-color: rgba(72, 72, 255, 0.438);
-        outline-offset: 4px;
       }
 
       .error {
@@ -142,9 +150,6 @@ export class SNNewsletterForm extends LitElement {
   @state()
   private _isPending: boolean = false;
 
-  @state()
-  private _successSubmit: boolean = false;
-
   @query("form")
   private _form!: HTMLFormElement;
 
@@ -153,6 +158,11 @@ export class SNNewsletterForm extends LitElement {
 
   @queryAll("sn-form-popover")
   private _popovers!: NodeListOf<SNFormPopover>;
+
+  @query('#form-info')
+  private _formInfo!: HTMLSpanElement;
+
+  private _timerID?: NodeJS.Timeout;
 
   private async _handleSubmit(event: MouseEvent): Promise<void> {
     event.preventDefault();
@@ -165,16 +175,13 @@ export class SNNewsletterForm extends LitElement {
       await postEmail(email);
       this._closeAllPopovers();
       this._popovers[0].show(); // Show success popover
-      this._successSubmit = true;
-      this._form.reset();
-      this._errorSpan.textContent = "";
+      this._updateSR('Subscription successful! Please check your email to confirm');
+      this._reset();
     } catch (error) {
       this._closeAllPopovers();
       this._popovers[1].show(); // Show error popover
-      this._successSubmit = false;
+      this._updateSR(' Failed to subscribe. Please ensure your email is correct or try again letter');
     }
-
-    this._isPending = false;
   }
 
   private _closeAllPopovers(): void {
@@ -183,11 +190,22 @@ export class SNNewsletterForm extends LitElement {
     });
   }
 
-  private _formInfo(): string {
-    if (this._isPending) return "Submitting...";
-    if (this._successSubmit)
-      return "Subscription successful! Please check your email to confirm";
-    return "Failed to subscribe. Please ensure your email is correct or try again letter";
+  private _updateSR(msg: string): void {
+    if(this._timerID) clearTimeout(this._timerID);
+    this._formInfo.setAttribute('aria-hidden', 'false');
+    this._formInfo.textContent = msg;
+
+    this._timerID = setTimeout(() => {
+      this._formInfo.setAttribute('aria-hidden', 'false');
+      this._formInfo.textContent = '';
+    }, 3000);
+  }
+
+  private _reset(): void {
+    this._form.reset();
+    this._isPending = false;
+    this._isValid = false;
+    this._errorSpan.textContent = "";
   }
 
   private _handleInput(event: Event): void {
@@ -229,21 +247,19 @@ export class SNNewsletterForm extends LitElement {
             id="error"
             role="status"
             aria-live="polite"
-            class=${classMap({error: true, hide: this._isValid})}
+            class=${classMap({ error: true, hide: this._isValid })}
           ></span>
         </div>
         <button
           @click=${this._handleSubmit}
-          ?disabled=${!this._isValid}
+          ?disabled=${!this._isValid || this._isPending}
           class=${classMap({ pending: this._isPending })}
           type="submit"
         >
           Subscribe
         </button>
       </form>
-      <span aria-live="assertive" class="sr-only" id="form-info"
-        >${this._formInfo()}</span
-      >
+      <span aria-live="assertive" class="sr-only" id="form-info"></span>
       <sn-form-popover successPopover>
         <div slot="type">Success</div>
         <div slot="message">

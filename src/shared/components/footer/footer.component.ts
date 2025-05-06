@@ -102,6 +102,7 @@ export class SNFooter extends LitElement {
             span {
                 text-wrap: pretty;
                 max-width: 40ch;
+                line-height: 1.5;
             }
         }
 
@@ -139,6 +140,14 @@ export class SNFooter extends LitElement {
         .social-container {
             display: flex;
             column-gap: 15px;
+
+            img {
+              filter: invert(0.5) brightness(1.2) saturate(0.2);
+            }
+        }
+
+        sn-link::part(a) {
+          font-size: 0.9rem;
         }
         `
     ];
@@ -154,7 +163,7 @@ export class SNFooter extends LitElement {
         </div>
         <div class="content">
           <div class="stylenest-container">
-            <svg
+            <svg aria-hidden="true"
               width="105"
               height="32"
               viewBox="0 0 105 32"

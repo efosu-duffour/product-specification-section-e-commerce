@@ -2,13 +2,16 @@ import { css } from "lit";
 
 export const resetStyles = css`
  :host {
-   display: grid;
-   align-items: center;
-   justify-content: center;
-   width: fit-content;
-   height: fit-content; 
-   box-sizing: border-box;
-   overflow: visible;
-   line-height: 1em;
+   * {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+   }
+
+   :host {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+   }
  }
 `
