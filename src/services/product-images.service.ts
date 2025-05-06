@@ -1,4 +1,4 @@
-import { ProductColor} from "./inventory.service";
+import { ProductColor } from "./inventory.service";
 import { ProductID } from "./products.service";
 
 export type ProductImage = {
@@ -9,7 +9,6 @@ export type ProductImage = {
 };
 
 export type ImageUrl = string;
-
 
 export type ProductImagesByColor = {
   color: ProductColor;
@@ -26,25 +25,37 @@ const SESSIONNAME = "sn-product-images";
 export class ProductImagesService {
   private _productsImages?: ProductImage[];
   createdAt?: number;
-  private _PRODUCTIMAGEAPI = import.meta.env.BASE_URL + 'data/product-images.json';
-  
+  private _PRODUCTIMAGEAPI =
+    import.meta.env.BASE_URL + "data/product-images.json";
+
   constructor() {
     if (ProductImagesService._INSTANCE) return ProductImagesService._INSTANCE;
     else {
       this.createdAt = Date.now();
       ProductImagesService._INSTANCE = this;
     }
+
+    this.init()
+      .then((productsImages) => {
+        this._productsImages = productsImages;
+      })
+      .catch((err) => console.warn(err));
   }
 
-  async init(): Promise<void> {
+  async init(): Promise<ProductImage[]> {
     // Fetches the product's images from server or cache
+    if (this._productsImages) return this._productsImages;
+    let productsImages: ProductImage[] = [];
+
     const cachedProductImages = sessionStorage.getItem(SESSIONNAME);
     if (cachedProductImages && cachedProductImages.length !== 0) {
-      this._productsImages = JSON.parse(cachedProductImages);
+      productsImages = JSON.parse(cachedProductImages);
     } else {
-      this._productsImages = await this._fetchProductImages();
-      sessionStorage.setItem(SESSIONNAME, JSON.stringify(this._productsImages));
+      productsImages = await this._fetchProductImages();
+      sessionStorage.setItem(SESSIONNAME, JSON.stringify(productsImages));
     }
+
+    return productsImages;
   }
 
   private async _fetchProductImages(): Promise<ProductImage[]> {
@@ -58,13 +69,11 @@ export class ProductImagesService {
       console.warn(err);
     }
 
-
     return fetchedProductImages;
   }
 
   get productsImages(): ProductImage[] {
-    if (!this._productsImages) return [];
-    return this._productsImages;
+    return this._productsImages ?? [];
   }
 
   getProductImagesByID(id: ProductID): ProductImagesByColor[] {
@@ -92,7 +101,7 @@ export class ProductImagesService {
     productImages: ProductImagesByColor[]
   ): ProductFirstImageWithColor[] {
     // Gets the first image specified color
-    return productImages.map(({color, images}) => {
+    return productImages.map(({ color, images }) => {
       return {
         color,
         image: images[0],
@@ -106,7 +115,11 @@ export class ProductImagesService {
     const result: ImageUrl[] = [];
     for (let i = 0; i < this.productsImages.length; i++) {
       const produtImage = this.productsImages[i];
-      if (produtImage.product_id !== id || registeredColors.has(produtImage.color)) continue;
+      if (
+        produtImage.product_id !== id ||
+        registeredColors.has(produtImage.color)
+      )
+        continue;
 
       result.push(produtImage.image_url);
       registeredColors.add(produtImage.color);
@@ -119,18 +132,20 @@ export class ProductImagesService {
     color: ProductColor
   ): ImageUrl[] {
     // Get product's images by the specified color
-    const productImage = productImages.find(productImage => productImage.color === color);
+    const productImage = productImages.find(
+      (productImage) => productImage.color === color
+    );
     if (!productImage) return [];
     return productImage.images;
   }
 
-
   getImagesByColor(id: ProductID, color: ProductColor): ImageUrl[] {
     const result: ImageUrl[] = [];
     for (let i = 0; i < this.productsImages.length; i++) {
-        const productImage = this.productsImages[i];
-        if (productImage.product_id !== id || productImage.color !== color) continue;
-        result.push(productImage.image_url);
+      const productImage = this.productsImages[i];
+      if (productImage.product_id !== id || productImage.color !== color)
+        continue;
+      result.push(productImage.image_url);
     }
     return result;
   }

@@ -229,8 +229,7 @@ describe('Inventory Service', () => {
         let inventories: Inventory[] = inventoryService.inventories;
         expect(inventories).toEqual([]); 
 
-        await inventoryService.init();
-        inventories = inventoryService.inventories;
+        inventories = await inventoryService.init();
         expect(inventories).toEqual(mockInventories);
     })
 

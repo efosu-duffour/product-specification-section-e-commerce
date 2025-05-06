@@ -17,11 +17,11 @@ export type Product = {
 const SESSIONNAME = "sn-products";
 export class ProductsService {
   createdAt?: number;
-  private _products: Product[] = [];
-  private _PRODUCTSAPI = import.meta.env.BASE_URL + 'data/products.json';
+  private _products?: Product[];
+  private _PRODUCTSAPI = import.meta.env.BASE_URL + "data/products.json";
 
   get products(): Product[] {
-    return this._products;
+    return this._products ?? [];
   }
 
   constructor() {
@@ -30,19 +30,30 @@ export class ProductsService {
       this.createdAt = Date.now();
       ProductsService._INSTANCE = this;
     }
+
+    this.init()
+      .then((products) => {
+        this._products = products;
+      })
+      .catch((err) => console.warn(err));
   }
 
   private static _INSTANCE: ProductsService | null = null;
 
-  async init(): Promise<void> {
+  async init(): Promise<Product[]> {
     // Fetches the products from server or cache
+    if (this._products) return this._products;
+    let products: Product[] = [];
+
     const cachedProducts = sessionStorage.getItem(SESSIONNAME);
     if (cachedProducts && cachedProducts.length !== 0) {
-      this._products = JSON.parse(cachedProducts);
+      products = JSON.parse(cachedProducts);
     } else {
-      this._products = await this._fetchProducts();
+      products = await this._fetchProducts();
       sessionStorage.setItem(SESSIONNAME, JSON.stringify(this._products));
     }
+
+    return products;
   }
 
   private async _fetchProducts(): Promise<Product[]> {
@@ -59,65 +70,82 @@ export class ProductsService {
     return fetchedProducts;
   }
 
-  static getIDsByCategory(products: Product[], category: Category): ProductID[] {
+  static getIDsByCategory(
+    products: Product[],
+    category: Category
+  ): ProductID[] {
     // Get the products ID with the specified Category
     const productIDs: ProductID[] = [];
     for (let i = 0; i < products.length; i++) {
-        const product = products[i];
-        if (product.category !== category) continue;
+      const product = products[i];
+      if (product.category !== category) continue;
 
-        productIDs.push(product.product_id);
+      productIDs.push(product.product_id);
     }
     return productIDs;
   }
 
   getIDsByCategory(category: Category): ProductID[] {
     // Get the products ID with the specified Category
-    return ProductsService.getIDsByCategory(this._products, category);
+    return ProductsService.getIDsByCategory(this.products, category);
   }
 
-  static getIDsByCollection(products: Product[], collection: Collection): ProductID[] {
+  static getIDsByCollection(
+    products: Product[],
+    collection: Collection
+  ): ProductID[] {
     // Get the products ID with the specified collection
     const productIDs: ProductID[] = [];
     for (let i = 0; i < products.length; i++) {
-        const product = products[i];
-        if (product.collection !== collection) continue;
+      const product = products[i];
+      if (product.collection !== collection) continue;
 
-        productIDs.push(product.product_id);
+      productIDs.push(product.product_id);
     }
     return productIDs;
   }
 
   getIDsByCollection(collection: Collection): ProductID[] {
     // Get the products ID with the specified collection
-    return ProductsService.getIDsByCollection(this._products, collection);
+    return ProductsService.getIDsByCollection(this.products, collection);
   }
 
-  static getProductsByCreatedAt(products: Product[], predicate: (createdAt: CreatedAt) => boolean): Product[] {
+  static getProductsByCreatedAt(
+    products: Product[],
+    predicate: (createdAt: CreatedAt) => boolean
+  ): Product[] {
     // Get the product according to when they were created
-    return products.filter(product => predicate(product.created_at));
+    return products.filter((product) => predicate(product.created_at));
   }
 
-  getProductsByCreatedAt(predicate: (createdAt: CreatedAt) => boolean): Product[] {
+  getProductsByCreatedAt(
+    predicate: (createdAt: CreatedAt) => boolean
+  ): Product[] {
     // Get the product according to when they were created
-    return ProductsService.getProductsByCreatedAt(this._products, predicate);
+    return ProductsService.getProductsByCreatedAt(this.products, predicate);
   }
 
-  static getProductsByCategory(products: Product[], category: Category): Product[] {
+  static getProductsByCategory(
+    products: Product[],
+    category: Category
+  ): Product[] {
     // Gets the products according to the specified category
-    return products.filter(product => product.category === category);
+    return products.filter((product) => product.category === category);
   }
 
   getProductsByCategory(category: Category): Product[] {
-    return ProductsService.getProductsByCategory(this._products, category);
+    return ProductsService.getProductsByCategory(this.products, category);
   }
 
-  static getProductsByCollection(products: Product[], collection: Collection): Product[] {
+  static getProductsByCollection(
+    products: Product[],
+    collection: Collection
+  ): Product[] {
     // Gets the products according to the specified collection
-    return products.filter(product => product.collection === collection);
+    return products.filter((product) => product.collection === collection);
   }
 
   getProductsByCollection(collection: Collection): Product[] {
-    return ProductsService.getProductsByCollection(this._products, collection);
+    return ProductsService.getProductsByCollection(this.products, collection);
   }
 }

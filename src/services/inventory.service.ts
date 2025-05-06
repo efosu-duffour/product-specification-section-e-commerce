@@ -25,8 +25,8 @@ export type Inventory = {
 const SESSIONNAME = "sn-inventories";
 export class InventoryService {
   createdAt?: number;
-  private _inventories: Inventory[] = [];
-  private _INVENTORIESAPI = import.meta.env.BASE_URL + 'data/inventory.json';
+  private _inventories?: Inventory[];
+  private _INVENTORIESAPI = import.meta.env.BASE_URL + "data/inventory.json";
 
   constructor() {
     if (InventoryService._INSTANCE) return InventoryService._INSTANCE;
@@ -34,17 +34,28 @@ export class InventoryService {
       this.createdAt = Date.now();
       InventoryService._INSTANCE = this;
     }
+
+    this.init()
+      .then((inventories) => {
+        this._inventories = inventories;
+      })
+      .catch((err) => console.warn(err));
   }
 
-  async init(): Promise<void> {
+  async init(): Promise<Inventory[]> {
     // Fetches the inventories from server or cache
+    if (this._inventories) return this._inventories;
+    let inventories: Inventory[] = [];
+
     const cachedInvetories = sessionStorage.getItem(SESSIONNAME);
     if (cachedInvetories && cachedInvetories.length !== 0) {
-      this._inventories = JSON.parse(cachedInvetories);
+      inventories = JSON.parse(cachedInvetories);
     } else {
-      this._inventories = await this._fetchInventories();
-      sessionStorage.setItem(SESSIONNAME, JSON.stringify(this._inventories));
+      inventories = await this._fetchInventories();
+      sessionStorage.setItem(SESSIONNAME, JSON.stringify(inventories));
     }
+
+    return inventories;
   }
 
   private async _fetchInventories(): Promise<Inventory[]> {
@@ -62,7 +73,7 @@ export class InventoryService {
   }
 
   get inventories(): Inventory[] {
-    return this._inventories;
+    return this._inventories ?? [];
   }
 
   static getInventoriesByID(
@@ -78,24 +89,27 @@ export class InventoryService {
     return InventoryService.getInventoriesByID(this.inventories, id);
   }
 
-  static getInventoriesByColor(inventories: Inventory[], color: ProductColor): Inventory[] {
+  static getInventoriesByColor(
+    inventories: Inventory[],
+    color: ProductColor
+  ): Inventory[] {
     // Get the inventories according to the color
-    return inventories.filter(inventory => inventory.color === color);
+    return inventories.filter((inventory) => inventory.color === color);
   }
 
   getInventoriesByColor(color: ProductID): Inventory[] {
     // Get the inventories according to the color
-    return InventoryService.getInventoriesByColor(this._inventories, color);
+    return InventoryService.getInventoriesByColor(this._inventories ?? [], color);
   }
 
   static getSizes(inventories: Inventory[]): Size[] {
     // Get the available sizes of the inventory
     const result: Set<Size> = new Set();
     for (let i = 0; i < inventories.length; i++) {
-        const size = inventories[i].size;
-        if (size === null || result.has(size)) continue;
+      const size = inventories[i].size;
+      if (size === null || result.has(size)) continue;
 
-        result.add(size);
+      result.add(size);
     }
     return [...result];
   }
@@ -105,18 +119,23 @@ export class InventoryService {
     return InventoryService.getSizes(this.inventories);
   }
 
-  static getSizesByColor(inventories: Inventory[], color: ProductColor): Size[] {
+  static getSizesByColor(
+    inventories: Inventory[],
+    color: ProductColor
+  ): Size[] {
     // Get the sizes of the specified color
-    const availableinventories = InventoryService.getInventoriesByColor(inventories, color);
+    const availableinventories = InventoryService.getInventoriesByColor(
+      inventories,
+      color
+    );
     const sizes = InventoryService.getSizes(availableinventories);
     return sizes;
   }
 
   getSizesByColor(color: ProductColor): Size[] {
     // Get the sizes of the specified color
-    return InventoryService.getSizesByColor(this._inventories, color);
+    return InventoryService.getSizesByColor(this._inventories ?? [], color);
   }
 
-
-  private static _INSTANCE: InventoryService | null = null; 
+  private static _INSTANCE: InventoryService | null = null;
 }
