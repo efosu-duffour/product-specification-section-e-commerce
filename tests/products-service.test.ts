@@ -1,7 +1,7 @@
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, beforeAll, describe, afterEach, it, expect } from "vitest";
-import { CreatedAt, Product, ProductsService } from "../src/services/products.service";
+import { CreatedAt, Product, ProductName, ProductsService } from "../src/services/products.service";
 
 const mockProducts: Product[] = [
   {
@@ -174,4 +174,27 @@ describe("Products Service", () => {
       },
     ])
   });
+
+  it('should get the product id of the specified time', async() => {
+    const productService = new ProductsService();
+    await productService.init();
+
+    const march_2024 = (createdAt: CreatedAt) => {
+      const date = new Date(createdAt);
+      return (date.getMonth() === 2 && date.getFullYear() === 2024);
+    }
+    const march_2024Products = productService.getIDsByCreatedAt(march_2024);
+    expect(march_2024Products).toEqual([
+        "elemental-sneakers",
+        "metro-hoodie",
+    ])
+  });
+
+  it('should get the product name of the product id', async () => {
+      const productService = new ProductsService();
+        await productService.init();
+
+        const name: ProductName = productService.getNameByID('metro-hoodie');
+        expect(name).toEqual('Metro Hoodie')
+    })
 });

@@ -1,7 +1,8 @@
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, beforeAll, describe, afterEach, it, expect } from "vitest";
-import { Inventory, InventoryService, Size } from "../src/services/inventory.service";
+import { Inventory, InventoryService, Price, ProductColor, Size } from "../src/services/inventory.service";
+import { ProductName } from "../src/services/products.service";
 
 const mockInventories: Inventory[] = [
     {
@@ -443,5 +444,31 @@ describe('Inventory Service', () => {
         expect(sizes).toEqual([
             'xs', 'sm', 'md', 'lg', 'xl'
         ])
+    });
+
+    it('should get the distinct colors of the product id', async () => {
+      const inventoryService = new InventoryService();
+        await inventoryService.init();
+
+        const color: ProductColor[] = inventoryService.getColorsByID('autumnal-knitwear');
+        expect(color).toEqual(['blue', 'brown', 'yellow'])
     })
+
+    it('should get the sale price of the product id', async () => {
+      const inventoryService = new InventoryService();
+        await inventoryService.init();
+
+        const sale_price: Price = inventoryService.getSalePriceByID('autumnal-knitwear');
+        expect(sale_price).toEqual(90)
+    })
+
+    it('should get the list sale of the product id', async () => {
+      const inventoryService = new InventoryService();
+        await inventoryService.init();
+
+        const list_price: Price = inventoryService.getListPriceByID('autumnal-knitwear');
+        expect(list_price).toEqual(100)
+    })
+
+    
 })

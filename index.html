@@ -9,6 +9,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <script type="module" src="/src/shared/scripts/fonts.scripts.ts"></script>
+  <script type="module" src="/src/shared/components/shared/Links/base-link/base-link.component.ts"></script>
+  <script type="module" src="/src/shared/components/shared/Galleries/image.component.ts"></script>
+  <script type="module" src="/src/shared/components/shared/Product/product-card.component.ts"></script>
+  <script type="module" src="/src/shared/components/shared/Product/product-list.component.ts"></script>
+  <script type="module" src="/src/shared/components/shared/Galleries/gallery-slider.component.ts"></script>
+  <script type="module" src="/src/shared/components/latest-arrivals/latest-arrivals.component.ts"></script>
   <link rel="stylesheet" href="./src/index.css" />
   <style>
     html {
@@ -38,6 +44,8 @@
       justify-content: center;
       align-items: center;
 
+      padding: 30px 0;
+
       overflow-y: scroll;      
       & > * {
         grid-column: 2 / 3;
@@ -47,9 +55,8 @@
 
 
   </style>
-  <script type="module" src="/src/shared/components/collections/collections.component.ts"></script>
 </head>
 <body>
-  <sn-collections></sn-collections>
+  <sn-latest-arrival></sn-latest-arrival>
 </body>
 </html>

@@ -34,12 +34,6 @@ export class ProductImagesService {
       this.createdAt = Date.now();
       ProductImagesService._INSTANCE = this;
     }
-
-    this.init()
-      .then((productsImages) => {
-        this._productsImages = productsImages;
-      })
-      .catch((err) => console.warn(err));
   }
 
   async init(): Promise<ProductImage[]> {
@@ -55,7 +49,7 @@ export class ProductImagesService {
       sessionStorage.setItem(SESSIONNAME, JSON.stringify(productsImages));
     }
 
-    return productsImages;
+    return this._productsImages = productsImages;
   }
 
   private async _fetchProductImages(): Promise<ProductImage[]> {
@@ -148,6 +142,26 @@ export class ProductImagesService {
       result.push(productImage.image_url);
     }
     return result;
+  }
+
+  static getFirstImageByColor(
+    productImages: ProductImage[],
+    id: ProductID,
+    color: ProductColor
+  ): ImageUrl {
+    const selectedProductImage = productImages.find(
+      (productImage) =>
+        productImage.product_id === id && productImage.color === color
+    );
+    return selectedProductImage ? selectedProductImage.image_url : "";
+  }
+
+  getFirstImageByColor(id: ProductID, color: ProductColor): ImageUrl {
+    return ProductImagesService.getFirstImageByColor(
+      this.productsImages,
+      id,
+      color
+    );
   }
 
   private static _INSTANCE: ProductImagesService | null = null;

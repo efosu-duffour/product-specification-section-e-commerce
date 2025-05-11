@@ -34,12 +34,6 @@ export class InventoryService {
       this.createdAt = Date.now();
       InventoryService._INSTANCE = this;
     }
-
-    this.init()
-      .then((inventories) => {
-        this._inventories = inventories;
-      })
-      .catch((err) => console.warn(err));
   }
 
   async init(): Promise<Inventory[]> {
@@ -55,7 +49,7 @@ export class InventoryService {
       sessionStorage.setItem(SESSIONNAME, JSON.stringify(inventories));
     }
 
-    return inventories;
+    return this._inventories = inventories;
   }
 
   private async _fetchInventories(): Promise<Inventory[]> {
@@ -136,6 +130,68 @@ export class InventoryService {
     // Get the sizes of the specified color
     return InventoryService.getSizesByColor(this._inventories ?? [], color);
   }
+
+  static getColorsByID(inventories: Inventory[], product_id: ProductID): ProductColor[] {
+    // Get the distinct colors of the product id
+    const colors: Set<ProductColor> = new Set();
+
+    for (let i = 0; i < inventories.length; i++) {
+      const product = inventories[i];
+      if (product.product_id !== product_id) continue;
+
+      colors.add(product.color);
+    }
+    return [...colors] ;
+  }
+
+  getColorsByID(product_id: ProductID): ProductColor[] {
+    // Get the diticnt colors of the product id
+    return InventoryService.getColorsByID(this.inventories, product_id);
+  }
+
+  static getSalePriceByID(inventories: Inventory[], product_id: ProductID): Price  {
+    // Get the first sale price by the product id
+
+    let price: Price = 0;
+    for (let i = 0; i < inventories.length; i++) {
+      const product = inventories[i];
+      if (product.product_id !== product_id) continue;
+      else
+        {
+          price = product.sale_price;
+          break;
+        }
+    }
+    return price;
+  }
+
+  getSalePriceByID(product_id: ProductID): Price {
+    // Get the first sale price by the product id
+    return InventoryService.getSalePriceByID(this.inventories, product_id);
+  }
+
+  static getListPriceByID(inventories: Inventory[], product_id: ProductID): Price  {
+    // Get the first list price by the product id
+    let price: Price = 0;
+    for (let i = 0; i < inventories.length; i++) {
+      const product = inventories[i];
+      if (product.product_id !== product_id) continue;
+      else
+        {
+          price = product.list_price;
+          break;
+        }
+    }
+    return price;
+  }
+
+  getListPriceByID(product_id: ProductID): Price {
+    // Get the first list price by the product id
+    
+    return InventoryService.getListPriceByID(this.inventories, product_id);
+  }
+
+  
 
   private static _INSTANCE: InventoryService | null = null;
 }

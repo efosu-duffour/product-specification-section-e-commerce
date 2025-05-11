@@ -29,9 +29,6 @@ export class CollectionsService {
       CollectionsService._INSTANCE = this;
     }
 
-    this.init()
-      .then((collections) => {this._collections = collections})
-      .catch((err) => console.log(err));
   }
 
   async init(): Promise<Collection[]> {
@@ -47,7 +44,7 @@ export class CollectionsService {
       sessionStorage.setItem(SESSIONNAME, JSON.stringify(collections));
     }
 
-    return collections;
+    return this._collections = collections;
   }
 
   private async _fetchCollections(): Promise<Collection[]> {

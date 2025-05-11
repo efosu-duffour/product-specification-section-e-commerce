@@ -8,7 +8,7 @@ class ResolveUrlDirective extends Directive {
             throw new Error('resolveUrl directive must be used in an attributes requiring url (e.g., href, src). ');
         }
 
-        const allowedAttributes = ['href', 'src', 'data-url'];
+        const allowedAttributes = ['href', 'src', 'data-url', 'placeholder'];
         if (!allowedAttributes.includes(partInfo.name)) {
             throw new Error(`resolveUrl directive can only be used on one of: ${allowedAttributes.join(', ')}`);
         }

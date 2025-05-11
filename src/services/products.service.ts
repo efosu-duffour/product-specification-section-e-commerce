@@ -30,12 +30,6 @@ export class ProductsService {
       this.createdAt = Date.now();
       ProductsService._INSTANCE = this;
     }
-
-    this.init()
-      .then((products) => {
-        this._products = products;
-      })
-      .catch((err) => console.warn(err));
   }
 
   private static _INSTANCE: ProductsService | null = null;
@@ -50,10 +44,10 @@ export class ProductsService {
       products = JSON.parse(cachedProducts);
     } else {
       products = await this._fetchProducts();
-      sessionStorage.setItem(SESSIONNAME, JSON.stringify(this._products));
+      sessionStorage.setItem(SESSIONNAME, JSON.stringify(products));
     }
 
-    return products;
+    return this._products = products;
   }
 
   private async _fetchProducts(): Promise<Product[]> {
@@ -125,6 +119,22 @@ export class ProductsService {
     return ProductsService.getProductsByCreatedAt(this.products, predicate);
   }
 
+  static getIDsByCreatedAt(products: Product[], predicate: (createdAt: CreatedAt) => boolean): ProductID[] {
+    // Get the product id satisfying the predicate
+    const productIDs: ProductID[] = [];
+
+    for (let i = 0; i < products.length; i++) {
+      if (!predicate(products[i].created_at)) continue;
+      productIDs.push(products[i].product_id);
+    }
+    return productIDs;
+  }
+
+  getIDsByCreatedAt(predicate: (createdAt: CreatedAt) => boolean): ProductID[] {
+    // Get the product id satisfying the predicate
+    return ProductsService.getIDsByCreatedAt(this.products, predicate)
+  }
+
   static getProductsByCategory(
     products: Product[],
     category: Category
@@ -147,5 +157,23 @@ export class ProductsService {
 
   getProductsByCollection(collection: Collection): Product[] {
     return ProductsService.getProductsByCollection(this.products, collection);
+  }
+
+  static getNameByID(products: Product[], product_id: ProductID): ProductName {
+    // Get the product name from the product id
+    let name: ProductName = '';
+    for (let i = 0; i < products.length; i++) {
+      if (products[i].product_id !== product_id) continue;
+      else {
+        name = products[i].name;
+        break;
+      }
+    }
+    return name;
+  }
+
+  getNameByID(product_id: ProductID): ProductName {
+    // Get the product name from the product id
+    return ProductsService.getNameByID(this.products, product_id);
   }
 }

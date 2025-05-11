@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
-    base: '/collections-e-commerce/'
+    base: '/latest-arrival-e-commerce/'
 })

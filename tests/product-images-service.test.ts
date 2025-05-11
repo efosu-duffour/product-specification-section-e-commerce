@@ -156,4 +156,12 @@ describe("Product Images Service", () => {
       "https://www.elemental-book-red-2.png"
     ])
   })
+
+  it('should provide the first image with each color of the product id', async () => {
+    const productImageService = new ProductImagesService();
+    await productImageService.init(); // Fetches the Data
+
+    const elementalFirstImagesWithColors = productImageService.getFirstImageByColor('elemental-book', 'red');
+    expect(elementalFirstImagesWithColors).toEqual( "https://www.elemental-book-red-1.png");
+  })
 });
