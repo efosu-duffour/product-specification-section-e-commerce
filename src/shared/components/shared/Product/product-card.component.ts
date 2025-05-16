@@ -75,7 +75,6 @@ export class SNProductCard extends LitElement {
         outline: 2px solid transparent;
         will-change: outline;
 
-
         &:has(fieldset:focus-within) {
           outline: 2px solid transparent;
         }
@@ -94,14 +93,16 @@ export class SNProductCard extends LitElement {
         outline: 2px solid black;
       }
 
-      .product-card-container:hover sn-img::part(img),
-      .product-card-container:focus-within sn-img::part(img) {
+      .product-card-container:hover sn-img::part(img-container),
+      .product-card-container:focus-within sn-img::part(img-container) {
         transform: scale(1.1);
       }
 
-      sn-img::part(img) {
+      sn-img::part(img-container) {
         transform: scale(1);
         will-change: transform;
+        width: 100%;
+        aspect-ratio: var(--aspect-ratio);
 
         @media (prefers-reduced-motion: no-preference) {
           transition: transform 500ms ease-in-out, opacity 500ms ease-in-out;
@@ -149,10 +150,6 @@ export class SNProductCard extends LitElement {
         text-decoration: line-through;
       }
 
-      sn-img::part(img) {
-        aspect-ratio: var(--aspect-ratio);
-      }
-
       .sr-only {
         position: absolute;
         left: -10000px;
@@ -181,7 +178,7 @@ export class SNProductCard extends LitElement {
 
         border-radius: 5px;
 
-        @media  (prefers-reduced-motion: no-preference) {
+        @media (prefers-reduced-motion: no-preference) {
           transition: all 200ms ease-in-out;
         }
 
@@ -245,16 +242,21 @@ export class SNProductCard extends LitElement {
           ${this.productItem?.images.map(
             (image) =>
               html`<sn-img
-                lazy
-                alt=${ifDefined(this.productItem?.product_name)}
-                src=${image.image}
                 placeholder=${resolveUrl(
                   getFilePathWithoutExtension(image.image) + "_20px.webp"
                 )}
                 class=${classMap({
                   active: this.selectedColor === image.color,
                 })}
-              ></sn-img>`
+              >
+                <img
+                  style="object-fit: cover; object-position: center; width: 100%; height: 100%;"
+                  width="200"
+                  loading="lazy"
+                  alt=${ifDefined(this.productItem?.product_name)}
+                  src=${resolveUrl(image.image)}
+                />
+              </sn-img>`
           )}
         </sn-gallery-slider>
         <span class="color">${this.selectedColor}</span>

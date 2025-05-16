@@ -1,49 +1,49 @@
 import { css, html, LitElement } from "lit";
-import { ifDefined } from "lit/directives/if-defined.js";
-import { customElement, property, query } from "lit/decorators.js";
-import { resolveUrl } from "../../../directives/resolve-url.directive";
+import { customElement, property, query, queryAssignedElements } from "lit/decorators.js";
+
 
 @customElement("sn-img")
 export class SNImg extends LitElement {
   static styles = [
     css`
-    img {
-      width: 100%;
-    }
-    .img-background {
-      position: relative;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
-    }
+      ::slotted(*) {
+        display: block;
+        width: 100%;
+        height: 100%;
+        will-change: opacity;
+        transition: opacity 500ms ease-in-out;
+        opacity: 0;
+      }
+      .img-background {
+        width: inherit;
+        aspect-ratio: inherit;
+        position: relative;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-clip: border-box;
+      }
 
-    .img-background::before {
-      content: '';
-      inset: 0;
-      position: absolute;
-      will-change: opacity;
-      transition: opacity 200ms ease-in-out;
-      animation: pulse 2.5s infinite alternate;
-      backdrop-filter: blur(5px);
-    }
+      .img-background::before {
+        content: "";
+        inset: 0;
+        position: absolute;
+        will-change: opacity;
+        transition: opacity 200ms ease-in-out;
+        animation: pulse 2.5s infinite alternate;
+        backdrop-filter: blur(5px);
+      }
 
-    .img-background.loaded::before {
-      animation: none;
-      content: none;
-    }
+      .img-background.loaded::before {
+        animation: none;
+        content: none;
+      }
 
-    .img-background > img {
-      opacity: 0;
-      will-change: opacity;
+      .img-background.loaded ::slotted(*) {
+        opacity: 1;
+      }
 
-      transition: opacity 500ms ease-in-out;
-    }
-
-    .img-background.loaded > img {
-      opacity: 1;
-    }
-
-    :host {
+      :host {
         padding: 0;
         margin: 0;
         box-sizing: border-box;
@@ -64,54 +64,52 @@ export class SNImg extends LitElement {
           background-color: rgba(255, 255, 255, 0.2);
         }
       }
-    `
-  ]
-  @property({ reflect: true })
-  src?: string;
+    `,
+  ];
 
   @property({ reflect: true })
   placeholder?: string;
 
-  @property({ reflect: true })
-  alt?: string;
-
-  @property({ type: Boolean })
-  lazy: boolean = false;
-
   @query(".img-background")
   private _imgBackground?: HTMLDivElement;
 
-  protected firstUpdated(): void {
-    if (!this._imgBackground) return;
-    const img = this._imgBackground.querySelector('img') as HTMLImageElement;
+  @queryAssignedElements()
+  private _slottedElements!: NodeListOf<HTMLImageElement | HTMLPictureElement>;
 
-    if (img.complete) {
+  protected firstUpdated(): void {
+    if (this._slottedElements.length === 0) return;
+
+    const slottedElement = this._slottedElements[0];
+    let  slottedImage!: HTMLImageElement;
+
+    if (slottedElement instanceof HTMLPictureElement) {
+      slottedImage = slottedElement.querySelector('img') as HTMLImageElement;
+    }
+    else {
+      slottedImage = slottedElement;
+    }
+
+    if (slottedImage.complete) {
       this._imageLoaded();
-    }else {
-      img.addEventListener('load', () => {
+    } else {
+      slottedImage.addEventListener("load", () => {
         this._imageLoaded();
-      })
+      });
     }
   }
 
   private _imageLoaded(): void {
-    this._imgBackground?.classList.add('loaded');
+    this._imgBackground?.classList.add("loaded");
   }
 
   protected render() {
     return html`
       <div
+      part="img-container"
         class="img-background"
         style=${`background-color: gray; background-image: url(${this.placeholder}); `}
       >
-        <img
-          part="img"
-          width="200"
-          style="object-position: center; object-fit: cover; "
-          loading=${this.lazy ? "lazy" : "eager"}
-          src=${ifDefined(resolveUrl(this.src))}
-          alt=${ifDefined(this.alt)}
-        />
+        <slot></slot>
       </div>
     `;
   }

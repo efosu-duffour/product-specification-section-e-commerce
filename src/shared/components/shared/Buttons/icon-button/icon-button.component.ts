@@ -37,7 +37,7 @@ export class SNIconButton extends SNBaseButton{
 
             opacity: 0;
             @media (prefers-reduced-motion: no-preference) {
-                transition: opacity 200ms ease-in-out;
+                transition: opacity 200ms ease-in-out, 200ms display;
                 transiton-behavior: allow-discrete;
             }
         }
